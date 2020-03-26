@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using CommunicatorCms.Core;
 using CommunicatorCms.Core.AppExtensions;
 using CommunicatorCms.Core.Helpers;
 using CommunicatorCms.Core.Settings;
@@ -23,6 +25,7 @@ namespace CommunicatorCms
 
         public static void Main(string[] args)
         {
+            WebSampleInstaller.InstallIfEmpty();
             LoadSettings();
 
             CreateHostBuilder(args).Build().Run();
@@ -55,6 +58,7 @@ namespace CommunicatorCms
             return Path.GetDirectoryName(Path.GetDirectoryName(sourceFilePath))!.Replace('\\', '/');
         }
 
+        
         
     }
 

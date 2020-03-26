@@ -9,8 +9,8 @@ namespace CommunicatorCms.Core.Settings
     {
         public static string SubPageOrderEllipsisIdentifier { get; } = "...";
 
-        public static string PropertiesFileName { get; private set; } = "_Properties.yaml";
-        public static string PropertiesLayoutFileName { get; private set; } = "_PropertiesLayout.yaml";
+        public static string PropertiesFileName { get; private set; } = "_properties.yaml";
+        public static string PropertiesLayoutFileName { get; private set; } = "_properties-layout.yaml";
     }
 
 }

@@ -1,6 +1,10 @@
 ﻿using CommunicatorCms.Core.AppFileSystem;
 using CommunicatorCms.Core.Helpers;
 using CommunicatorCms.Core.Settings;
+using Markdig;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,7 +39,7 @@ namespace CommunicatorCms.Core
 
         public static async Task<SourcePage> LoadPageFromUrl(string url, RequestState? requestState = null)
         {
-            var appPath = AppPath.Join(GeneralSettings.WebPagesPath, url);
+            var appPath = AppPath.ConvertUrlToAppPath(url);
             var sourcePage = await LoadPageFromAppPath(appPath, requestState);
 
             return sourcePage;
@@ -48,6 +52,12 @@ namespace CommunicatorCms.Core
                 var propertiesLayoutFilePath = AppPath.Join(appPath, SourcePageSettings.PropertiesLayoutFileName);
 
                 var sourcePageProperties = YamlDeserializer.Deserialize<SourcePageProperties>(await AppFile.ReadAllTextAsync(propertiesFilePath));
+
+                if (sourcePageProperties == null) 
+                {
+                    sourcePageProperties = new SourcePageProperties();
+                }
+
                 var sourcePagePropertiesLayout = SourcePagePropertiesLayout.Default;
 
                 if (AppFile.Exists(propertiesLayoutFilePath)) 
@@ -72,6 +82,37 @@ namespace CommunicatorCms.Core
             return AppFile.Exists(AppPath.Join(appPath, SourcePageSettings.PropertiesFileName));
         }
 
+        public async Task<string> Render(RazorPageBase razorPage, IHtmlHelper htmlHelper) 
+        {
+            var contentFileAppPaths = GetContentFileAppPaths();
+
+            foreach (var cfap in contentFileAppPaths) 
+            {
+                razorPage.WriteLiteral($"<div class='{Css.ContentItemClassName}'>");
+
+                if (cfap.EndsWith(".cshtml"))
+                {
+                    await htmlHelper.RenderPartialAsync(cfap);
+                }
+                else 
+                {
+                    var content = await AppFile.ReadAllTextAsync(cfap);
+
+                    if (cfap.EndsWith(".md"))
+                    {
+                        razorPage.WriteLiteral(Markdown.ToHtml(content));
+                    }
+                    else 
+                    {
+                        razorPage.WriteLiteral(content);
+                    }
+                }
+
+                razorPage.WriteLiteral($"</div>");
+            }
+
+            return "";
+        }
         public async Task<List<SourcePage>> GetSubPages()
         {
             if (_subPages == null)

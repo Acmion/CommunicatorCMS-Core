@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CommunicatorCms.Core.Content
 {
-    public class ContentItem
+    public abstract class ContentItem
     {
     }
 }
