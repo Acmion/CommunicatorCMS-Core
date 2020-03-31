@@ -13,7 +13,12 @@ namespace CommunicatorCms.Core.AppFileSystem
             return File.Exists(AppPath.ConvertAppPathToAbsolutePath(appPath));
         }
 
-        public static async Task<string> ReadAllTextAsync(string appPath) 
+        public static string ReadAllText(string appPath)
+        {
+            return File.ReadAllText(AppPath.ConvertAppPathToAbsolutePath(appPath));
+        }
+
+        public static async Task<string> ReadAllTextAsync(string appPath)
         {
             return await File.ReadAllTextAsync(AppPath.ConvertAppPathToAbsolutePath(appPath));
         }

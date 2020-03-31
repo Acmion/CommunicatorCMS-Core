@@ -100,11 +100,11 @@ namespace CommunicatorCms.Core
 
                     if (cfap.EndsWith(".md"))
                     {
-                        razorPage.WriteLiteral(Markdown.ToHtml(content));
+                        razorPage.Output.Write(Markdown.ToHtml(content));
                     }
                     else 
                     {
-                        razorPage.WriteLiteral(content);
+                        razorPage.Output.Write(content);
                     }
                 }
 

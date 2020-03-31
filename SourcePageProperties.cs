@@ -11,6 +11,8 @@ namespace CommunicatorCms.Core
         public string Title { get; set; } = "Unknown";
         public string RedirectUrl { get; set; } = "";
 
+
+        public string Layout { get; set; } = "";
         public bool ShowInNavigationMenus { get; set; } = true;
         public bool ShowTopNavigationMenu { get; set; } = true;
         public bool ShowSideNavigationMenu { get; set; } = true;

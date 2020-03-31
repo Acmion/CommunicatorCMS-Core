@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CommunicatorCms.Core;
 using CommunicatorCms.Core.AppExtensions;
+using CommunicatorCms.Core.AppFileSystem;
 using CommunicatorCms.Core.Helpers;
 using CommunicatorCms.Core.Settings;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +23,8 @@ namespace CommunicatorCms
     {
         public static string RootPath { get; } = GetAppRootPath();
         public static CultureInfo AmericanCultureInfo { get; } = CultureInfo.GetCultureInfo("en-US");
+        public static IDeserializer YamlDeserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+        
 
         public static void Main(string[] args)
         {
@@ -42,15 +45,22 @@ namespace CommunicatorCms
 
         public static void LoadSettings()
         {
-            var yamlDeserializer = new DeserializerBuilder().Build();
+            LoadSettingsClass(typeof(AppSettings), "/Settings/AppSettings.yaml");
+            return;
 
-            return; 
+            var sourcePageSettings = YamlDeserializer.Deserialize<Dictionary<string, object>>(AppFile.ReadAllText("Settings/SourcePageSettings.yaml"));
 
-            var generalSettings = yamlDeserializer.Deserialize<Dictionary<string, object>>(File.ReadAllText("Settings/GeneralSettings.yaml"));
-            var sourcePageSettings = yamlDeserializer.Deserialize<Dictionary<string, object>>(File.ReadAllText("Settings/SourcePageSettings.yaml"));
-
-            ReflectionHelper.PopulatePublicStaticProperties(typeof(GeneralSettings), generalSettings);
             ReflectionHelper.PopulatePublicStaticProperties(typeof(SourcePageSettings), sourcePageSettings);
+        }
+
+        private static void LoadSettingsClass(Type settingsType, string settingsFileAppPath) 
+        {
+            if (AppFile.Exists(settingsFileAppPath))
+            {
+                var settings = YamlDeserializer.Deserialize<Dictionary<string, object>>(AppFile.ReadAllText(settingsFileAppPath));
+                ReflectionHelper.PopulatePublicStaticProperties(settingsType, settings);
+            }
+
         }
 
         private static string GetAppRootPath([CallerFilePath] string sourceFilePath = "")
