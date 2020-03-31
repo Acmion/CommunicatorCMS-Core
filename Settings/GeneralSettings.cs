@@ -17,6 +17,8 @@ namespace CommunicatorCms.Core.Settings
         public static string WebFooterPath { get; set; } = "/Web/General/Footer";
         public static string WebHeadPath { get; set; } = "/Web/General/Head";
 
+        public static string DataRootPath { get; set; } = "/Data";
+
         public static string WebExtensionsLoadFileName { get; private set; } = "LoadExtension.cshtml";
 
     }
