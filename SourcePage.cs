@@ -88,8 +88,6 @@ namespace CommunicatorCms.Core
 
             foreach (var cfap in contentFileAppPaths) 
             {
-                razorPage.WriteLiteral($"<div class='{Css.ContentItemClassName}'>");
-
                 if (cfap.EndsWith(".cshtml"))
                 {
                     await htmlHelper.RenderPartialAsync(cfap);
@@ -107,8 +105,6 @@ namespace CommunicatorCms.Core
                         razorPage.Output.Write(content);
                     }
                 }
-
-                razorPage.WriteLiteral($"</div>");
             }
 
             return "";
