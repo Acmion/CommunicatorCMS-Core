@@ -11,19 +11,22 @@ namespace CommunicatorCms.Core
 {
     public class RequestState
     {
-        public HttpRequest? HttpRequest { get; set; }
         public dynamic Dynamic { get; set; } = new ExpandoObject();
+        public string Url => HttpRequest.Query[QuerySettings.ResourceParameter];
+        public HttpRequest HttpRequest => _httpContextAccessor.HttpContext.Request;
 
+        private IHttpContextAccessor _httpContextAccessor;
         private Dictionary<string, SourcePage> _pageByUrl;
 
-        public RequestState() 
+        public RequestState(IHttpContextAccessor httpContextAccessor) 
         {
+            _httpContextAccessor = httpContextAccessor;
             _pageByUrl = new Dictionary<string, SourcePage>();
         }
 
         public async Task<SourcePage> GetCurrentPage() 
         {
-            var pageUrl = HttpRequest!.Query[QuerySettings.ResourceParameter];
+            var pageUrl = HttpRequest.Query[QuerySettings.ResourceParameter];
 
             return await GetPageByUrl(pageUrl);
         }
