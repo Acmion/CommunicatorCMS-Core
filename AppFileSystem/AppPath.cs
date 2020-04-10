@@ -38,8 +38,8 @@ namespace CommunicatorCms.Core.AppFileSystem
         {
             if (childUrl.StartsWith(parentUrl)) 
             {
-                var parentDirectories = parentUrl.Split('/');
-                var childDirectories = childUrl.Split('/');
+                var parentDirectories = parentUrl.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                var childDirectories = childUrl.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
                 var c = parentDirectories.Length;
                 for(var i = 0; i < c; i++)

@@ -68,6 +68,12 @@ namespace CommunicatorCms.Core
                 var sourcePage = new SourcePage(sourcePageProperties, sourcePagePropertiesLayout);
 
                 sourcePage.PageUrl = AppPath.ConvertAppPathToUrl(appPath);
+
+                if (!sourcePage.PageUrl.EndsWith('/')) 
+                {
+                    sourcePage.PageUrl += '/';
+                }
+
                 sourcePage.PageAppPath = appPath;
                 sourcePage.RequestState = requestState;
 
