@@ -81,8 +81,9 @@ namespace CommunicatorCms
         {
             var a = $"{RenderingSettings.CoreUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.MainFileName}";
             var rewriteOptions = new RewriteOptions()
-                .AddRewrite(@"(.*)\.cshtml$", "$1", false)
                 .AddRewrite("static/.*", "$0", true)
+                .AddRedirect(".*[^/]$", "$0/")
+                .AddRewrite(@"(.*)\.cshtml$", "$1", false)
                 .AddRewrite("Error/.*", "/Rendering/Error", true)
                 .AddRewrite("actions/get/.*", $"{RenderingSettings.CoreUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.GetActionFileName}", true)
                 .AddRewrite("Actions/Get/.*", $"{RenderingSettings.CoreUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.GetActionFileName}", true)
