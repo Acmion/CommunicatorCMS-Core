@@ -9,15 +9,20 @@ namespace CommunicatorCms.Core.Extensions
 {
     public static class IHtmlHelperExtension
     {
-        public static Task RenderActiveOrDefaultAsync(this IHtmlHelper<dynamic> htmlHelper, string activePath, string defaultPath)
+        public static Task RenderPartialAsyncFromUrl(this IHtmlHelper htmlHelper, string url)
         {
-            if (AppFile.Exists(activePath))
+            return htmlHelper.RenderPartialAsync(AppUrl.ConvertToAppPath(url));
+        }
+
+        public static Task RenderActiveOrDefaultAsyncFromUrl(this IHtmlHelper htmlHelper, string activeUrl, string defaulturl)
+        {
+            if (AppUrl.Exists(activeUrl))
             {
-                return htmlHelper.RenderPartialAsync(activePath);
+                return htmlHelper.RenderPartialAsyncFromUrl(activeUrl);
             }
-            else if (AppFile.Exists(defaultPath))
+            else if (AppUrl.Exists(defaulturl))
             {
-                return htmlHelper.RenderPartialAsync(defaultPath);
+                return htmlHelper.RenderPartialAsyncFromUrl(defaulturl);
             }
 
             return Task.CompletedTask;

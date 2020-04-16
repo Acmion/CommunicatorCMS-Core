@@ -18,6 +18,7 @@ namespace CommunicatorCms.Core
     {
         private static char IgnoreContentFileStartingCharacter = '_';
         private static IDeserializer YamlDeserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+        private static MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder().UseAutoIdentifiers().Build();
 
         public string PageUrl { get; set; } = "";
         public string PageAppPath { get; set; } = "N/A";
@@ -39,7 +40,7 @@ namespace CommunicatorCms.Core
 
         public static async Task<SourcePage> LoadPageFromUrl(string url, RequestState? requestState = null)
         {
-            var appPath = AppPath.ConvertUrlToAppPath(url);
+            var appPath = AppUrl.ConvertToAppPath(url);
             var sourcePage = await LoadPageFromAppPath(appPath, requestState);
 
             return sourcePage;
@@ -67,7 +68,7 @@ namespace CommunicatorCms.Core
                 
                 var sourcePage = new SourcePage(sourcePageProperties, sourcePagePropertiesLayout);
 
-                sourcePage.PageUrl = AppPath.ConvertAppPathToUrl(appPath);
+                sourcePage.PageUrl = AppPath.ConvertToUrl(appPath);
 
                 if (!sourcePage.PageUrl.EndsWith('/')) 
                 {
@@ -104,7 +105,7 @@ namespace CommunicatorCms.Core
 
                     if (cfap.EndsWith(".md"))
                     {
-                        razorPage.Output.Write(Markdown.ToHtml(content));
+                        razorPage.Output.Write(Markdown.ToHtml(content, MarkdownPipeline));
                     }
                     else 
                     {

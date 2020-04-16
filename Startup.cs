@@ -16,7 +16,9 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using CommunicatorCms.Core.UrlModification;
 using YamlDotNet.Serialization;
 
 namespace CommunicatorCms
@@ -62,10 +64,22 @@ namespace CommunicatorCms
                 app.UseHsts();
             }
 
-            ConfigureRewriteOptions(app);
+            app.UseUrlRewrites();
+            //ConfigureRewriteOptions(app);
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(App.RootPath + "/Web"),
+                RequestPath = "",
+                OnPrepareResponse = ctx =>
+                {
+                    ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age=60");
+                },
+                //ServeUnknownFileTypes = true, // Security risk according to https://docs.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-3.1, but unlikely
+            });
 
             app.UseRouting();
 
@@ -79,20 +93,34 @@ namespace CommunicatorCms
 
         private void ConfigureRewriteOptions(IApplicationBuilder app) 
         {
-            var a = $"{RenderingSettings.CoreUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.MainFileName}";
+            var a = $"{RenderingSettings.InitializerUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.WwwFileName}";
             var rewriteOptions = new RewriteOptions()
                 .AddRewrite("static/.*", "$0", true)
                 .AddRedirect(".*[^/]$", "$0/")
                 .AddRewrite(@"(.*)\.cshtml$", "$1", false)
                 .AddRewrite("Error/.*", "/Rendering/Error", true)
-                .AddRewrite("actions/get/.*", $"{RenderingSettings.CoreUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.GetActionFileName}", true)
-                .AddRewrite("Actions/Get/.*", $"{RenderingSettings.CoreUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.GetActionFileName}", true)
-                .AddRewrite("(.*)", $"{RenderingSettings.CoreUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.MainFileName}", false);
+                .AddRewrite("actions/get/.*", $"{RenderingSettings.InitializerUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.ActionFileName}", true)
+                .AddRewrite("Actions/Get/.*", $"{RenderingSettings.InitializerUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.ActionFileName}", true)
+                .AddRewrite("(.*)", $"{RenderingSettings.InitializerUrl}?{QuerySettings.ResourceParameter}=$0&{QuerySettings.RenderingResourceParameter}={RenderingSettings.WwwFileName}", false);
 
             app.UseRewriter(rewriteOptions);
 
         }
 
         
+    }
+
+    public class MyViewLocationExpander : IViewLocationExpander
+    {
+        public void PopulateValues(ViewLocationExpanderContext context) { }
+
+        public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
+        {
+            return new[]
+            {
+                "~/Web/{0}.cshtml",
+                "~/Web/{0}"
+            }; // add `.Union(viewLocations)` to add default locations
+        }
     }
 }

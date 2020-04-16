@@ -45,7 +45,7 @@ namespace CommunicatorCms.Core
         }
         public async Task<SourcePage> GetPageByAppPath(string appPath)
         {
-            var url = AppPath.ConvertAppPathToUrl(appPath);
+            var url = AppPath.ConvertToUrl(appPath);
 
             return await GetPageByUrl(url);
         }

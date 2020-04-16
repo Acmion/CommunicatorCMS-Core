@@ -29,7 +29,7 @@ namespace CommunicatorCms.Core.AppExtensions
         {
             ClearAppExtensions();
 
-            var extensionAppDirs = AppDirectory.GetDirectories(GeneralSettings.WebExtensionsPath);
+            /*var extensionAppDirs = AppDirectory.GetDirectories(GeneralSettings.WebExtensionsPath);
 
             foreach (var extAppDir in extensionAppDirs) 
             {
@@ -40,6 +40,7 @@ namespace CommunicatorCms.Core.AppExtensions
                     await htmlHelper.RenderPartialAsync(loadExtensionFilePath);
                 }
             }
+            */
         }
 
         public static void OnRequestStart(RequestState requestState)

@@ -9,6 +9,8 @@ namespace CommunicatorCms.Core.AppFileSystem
 {
     public static class AppPath
     {
+        public const string DirectorySeparator = "/";
+
         public static string ConvertAppPathToAbsolutePath(string appPath)
         {
             return Path.Join(App.RootPath, appPath);
@@ -19,15 +21,10 @@ namespace CommunicatorCms.Core.AppFileSystem
             return absolutePath.Replace(App.RootPath, "");
         }
 
-        public static string ConvertUrlToAppPath(string url)
+        public static string ConvertToUrl(string appPath)
         {
-            return string.Join('/', GeneralSettings.WebPagesPath, url).Replace("//", "/");
+            return appPath.Replace(GeneralSettings.WebRootPath, "").Replace(UrlSettings.WwwRootUrl, "").Replace('\\', '/');
         }
-        public static string ConvertAppPathToUrl(string appPath)
-        {
-            return appPath.Replace(GeneralSettings.WebPagesPath, "").Replace('\\', '/');
-        }
-        
 
         public static string Join(params string[] paths)
         {

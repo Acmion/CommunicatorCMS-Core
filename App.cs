@@ -28,7 +28,6 @@ namespace CommunicatorCms
 
         public static void Main(string[] args)
         {
-            WebSampleInstaller.InstallIfEmpty();
             LoadSettings();
 
             CreateHostBuilder(args).Build().Run();
