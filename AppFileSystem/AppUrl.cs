@@ -3,33 +3,47 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunicatorCms.Core.Extensions;
 using CommunicatorCms.Core.Settings;
 
 namespace CommunicatorCms.Core.AppFileSystem
 {
     public static class AppUrl
     {
-        public const char Separator = '/';
-        public const string SeparatorString = "/";
-        public const string UnservablePrefix = "/_";
+        public static char Separator = '/';
+        public static string SeparatorString = "/";
+        public static string[] UnservableStrings = { "/_", "/.", ".cshtml" };
 
-        public static string ConvertToAppPath(string url)
+        public static string ConvertToActualUrl(string url) 
         {
-            if (UrlSettings.RootUrlsWithNonVirtualPaths.Contains(RootUrl(url)))
+            if (url.StartsWith("~/")) 
             {
-                return AppPath.Join(GeneralSettings.WebRootPath, url);
+                url = url.ReplaceFirst("~/", "/");
             }
 
-            return AppPath.Join(GeneralSettings.WebRootPath, UrlSettings.WwwRootUrl, url);
+            if (url.StartsWith("/Web"))
+            {
+                url = url.ReplaceFirst("/Web", "");
+            }
+
+            if (UrlSettings.RootUrlsWithNonVirtualPaths.Contains(RootUrl(url)))
+            {
+                return url;    
+            }
+            else if (!url.StartsWith("/www"))
+            {
+                url = "/www" + url;
+            }
+
+            return url;
+        }
+        public static string ConvertToAppPath(string url)
+        {
+            return AppPath.Join(GeneralSettings.WebRootPath, ConvertToActualUrl(url));
         }
         public static string ConvertToAbsolutePath(string url)
         {
-            if (UrlSettings.RootUrlsWithNonVirtualPaths.Contains(RootUrl(url)))
-            {
-                return AppPath.Join(App.RootPath, GeneralSettings.WebRootPath, url);
-            }
-
-            return AppPath.Join(App.RootPath, GeneralSettings.WebRootPath, UrlSettings.WwwRootUrl, url);
+            return AppPath.Join(App.RootPath, ConvertToAppPath(url));
         }
 
         public static bool Exists(string url) 
@@ -47,7 +61,15 @@ namespace CommunicatorCms.Core.AppFileSystem
         }
         public static bool IsDirectlyServable(string url) 
         {
-            return !(url.Contains(UnservablePrefix) || url.Contains(".cshtml"));
+            foreach (var unservableString in UnservableStrings) 
+            {
+                if (url.Contains(unservableString)) 
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static string RootUrl(string url)

@@ -78,7 +78,7 @@ namespace CommunicatorCms
                 {
                     ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age=60");
                 },
-                //ServeUnknownFileTypes = true, // Security risk according to https://docs.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-3.1, but unlikely
+                ServeUnknownFileTypes = true, // Security risk according to https://docs.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-3.1, but unlikely
             });
 
             app.UseRouting();

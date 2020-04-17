@@ -16,7 +16,7 @@ namespace CommunicatorCms.Core.UrlModification
         {
             app.Use(async (context, next) =>
             {
-                var requestedUrl = context.Request.Path.Value;
+                var requestedUrl = AppUrl.ConvertToActualUrl(context.Request.Path.Value);
 
                 if (!AppUrl.IsDirectlyServable(requestedUrl)) 
                 {
