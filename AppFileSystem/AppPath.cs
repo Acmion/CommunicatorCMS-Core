@@ -15,10 +15,14 @@ namespace CommunicatorCms.Core.AppFileSystem
         {
             return Path.Join(App.RootPath, appPath);
         }
-
         public static string ConvertAbsolutePathToAppPath(string absolutePath)
         {
             return absolutePath.Replace(App.RootPath, "");
+        }
+
+        public static string GetFileName(string path)
+        {
+            return Path.GetFileName(path);
         }
 
         public static string ConvertToUrl(string appPath)

@@ -11,6 +11,7 @@ namespace CommunicatorCms.Core.Settings
 
         public static string PropertiesFileName { get; private set; } = "_properties.yaml";
         public static string PropertiesLayoutFileName { get; private set; } = "_properties-layout.yaml";
+        public static string PropertiesExtraFileName { get; private set; } = "_properties-extra.yaml";
     }
 
 }

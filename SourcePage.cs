@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,18 +25,21 @@ namespace CommunicatorCms.Core
         public string PageAppPath { get; set; } = "N/A";
         public string Url { get => string.IsNullOrEmpty(Properties.RedirectUrl) ? PageUrl : Properties.RedirectUrl; }
 
-        public RequestState? RequestState { get; set; }
         public SourcePageProperties Properties { get; set; }
         public SourcePagePropertiesLayout PropertiesLayout { get; set; }
+        public dynamic PropertiesExtra { get; set; }
+
+        public RequestState? RequestState { get; set; }
         public List<string> ContentFileAppPaths { get => GetContentFileAppPaths(); }
 
         private List<SourcePage>? _subPages;
         private List<string>? _contentFileAppPaths;
 
-        public SourcePage(SourcePageProperties properties, SourcePagePropertiesLayout propertiesLayout)
+        public SourcePage(SourcePageProperties properties, SourcePagePropertiesLayout propertiesLayout, dynamic propertiesExtra)
         {
             Properties = properties;
             PropertiesLayout = propertiesLayout;
+            PropertiesExtra = propertiesExtra;
         }
 
         public static async Task<SourcePage> LoadPageFromUrl(string url, RequestState? requestState = null)
@@ -51,6 +55,7 @@ namespace CommunicatorCms.Core
             {
                 var propertiesFilePath = AppPath.Join(appPath, SourcePageSettings.PropertiesFileName);
                 var propertiesLayoutFilePath = AppPath.Join(appPath, SourcePageSettings.PropertiesLayoutFileName);
+                var propertiesExtraFilePath = AppPath.Join(appPath, SourcePageSettings.PropertiesExtraFileName);
 
                 var sourcePageProperties = YamlDeserializer.Deserialize<SourcePageProperties>(await AppFile.ReadAllTextAsync(propertiesFilePath));
 
@@ -65,8 +70,15 @@ namespace CommunicatorCms.Core
                 {
                     sourcePagePropertiesLayout = YamlDeserializer.Deserialize<SourcePagePropertiesLayout>(await AppFile.ReadAllTextAsync(propertiesLayoutFilePath));
                 }
+
+                var sourcePagePropertiesExtra = new ExpandoObject();
+
+                if (AppFile.Exists(propertiesExtraFilePath)) 
+                {
+                    sourcePagePropertiesExtra = YamlDeserializer.Deserialize<ExpandoObject>(await AppFile.ReadAllTextAsync(propertiesExtraFilePath));
+                }
                 
-                var sourcePage = new SourcePage(sourcePageProperties, sourcePagePropertiesLayout);
+                var sourcePage = new SourcePage(sourcePageProperties, sourcePagePropertiesLayout, sourcePagePropertiesExtra);
 
                 sourcePage.PageUrl = AppPath.ConvertToUrl(appPath);
 
@@ -81,7 +93,7 @@ namespace CommunicatorCms.Core
                 return sourcePage;
             }
 
-            return new SourcePage(new SourcePageProperties(), SourcePagePropertiesLayout.Default);
+            return new SourcePage(new SourcePageProperties(), SourcePagePropertiesLayout.Default, new ExpandoObject());
         }
 
         private static bool IsAppPathSourcePage(string appPath)

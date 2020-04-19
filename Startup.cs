@@ -20,6 +20,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using CommunicatorCms.Core.UrlModification;
 using YamlDotNet.Serialization;
+using Microsoft.Net.Http.Headers;
 
 namespace CommunicatorCms
 {
@@ -53,8 +54,12 @@ namespace CommunicatorCms
         {
             env.ContentRootPath = App.RootPath;
 
+            var staticFileCacheTimeSpan = TimeSpan.FromDays(1);
+
             if (env.IsDevelopment())
             {
+                staticFileCacheTimeSpan = TimeSpan.FromSeconds(10);
+
                 app.UseDeveloperExceptionPage();
             }
             else
@@ -76,7 +81,12 @@ namespace CommunicatorCms
                 RequestPath = "",
                 OnPrepareResponse = ctx =>
                 {
-                    ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age=60");
+                    var headers = ctx.Context.Response.GetTypedHeaders();
+                    headers.CacheControl = new CacheControlHeaderValue
+                    {
+                        Public = true,
+                        MaxAge = staticFileCacheTimeSpan
+                    };
                 },
                 ServeUnknownFileTypes = true, // Security risk according to https://docs.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-3.1, but unlikely
             });
